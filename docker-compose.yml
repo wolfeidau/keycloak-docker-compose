@@ -1,0 +1,39 @@
+version: "2"
+
+services:
+  keycloak_db:
+    image: postgres:latest
+    ports:
+      - "15432:15432"
+    environment:
+        - POSTGRES_DB=keycloak
+        - POSTGRES_USER=keycloak
+        - POSTGRES_PASSWORD=6jhVPaQWhgEMl0sXPnNmkLfS
+        - POSTGRES_ROOT_PASSWORD=qgZqZGdoe5loJ0OrZvq36LBr
+    volumes:
+      - keycloak_postgresql:/var/lib/postgresql
+      - keycloak_postgresql_data:/var/lib/postgresql/data
+
+  keycloak:
+      image: jboss/keycloak-postgres
+      environment:
+        - KEYCLOAK_LOGLEVEL=DEBUG
+        - POSTGRES_USER=keycloak
+        - POSTGRES_DATABASE=keycloak
+        - POSTGRES_PASSWORD=6jhVPaQWhgEMl0sXPnNmkLfS
+        - POSTGRES_PORT_5432_TCP_ADDR=postgres
+        - POSTGRES_PORT_5432_TCP_PORT=5432
+        - KEYCLOAK_USER=admin
+        - KEYCLOAK_PASSWORD=pikathnoOoEezsSc0l8ZCfZs
+      links:
+        - keycloak_db:postgres
+      ports:
+        - "18443:8443"
+        - "18080:8080"
+      volumes:
+        - keycloak_data:/data
+
+volumes: 
+  keycloak_postgresql:
+  keycloak_postgresql_data:
+  keycloak_data:
