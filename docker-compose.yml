@@ -17,12 +17,13 @@ services:
   keycloak:
       image: jboss/keycloak
       environment:
+        - DB_VENDOR=postgres
         - KEYCLOAK_LOGLEVEL=DEBUG
-        - POSTGRES_USER=keycloak
-        - POSTGRES_DATABASE=keycloak
-        - POSTGRES_PASSWORD=6jhVPaQWhgEMl0sXPnNmkLfS
-        - POSTGRES_PORT_5432_TCP_ADDR=postgres
-        - POSTGRES_PORT_5432_TCP_PORT=5432
+        - DB_USER=keycloak
+        - DB_DATABASE=keycloak
+        - DB_PASSWORD=6jhVPaQWhgEMl0sXPnNmkLfS
+        - DB_ADDR=keycloak_db
+        - DB_PORT=5432
         - KEYCLOAK_USER=admin
         - KEYCLOAK_PASSWORD=pikathnoOoEezsSc0l8ZCfZs
       links:
