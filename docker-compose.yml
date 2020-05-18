@@ -15,25 +15,59 @@ services:
       - keycloak_postgresql_data:/var/lib/postgresql/data
 
   keycloak:
-      image: jboss/keycloak-postgres
+      image: jboss/keycloak
       environment:
         - KEYCLOAK_LOGLEVEL=DEBUG
-        - POSTGRES_USER=keycloak
-        - POSTGRES_DATABASE=keycloak
-        - POSTGRES_PASSWORD=6jhVPaQWhgEMl0sXPnNmkLfS
-        - POSTGRES_PORT_5432_TCP_ADDR=postgres
-        - POSTGRES_PORT_5432_TCP_PORT=5432
+        - DB_VENDOR=postgres
+        - DB_USER=keycloak
+        - DB_DATABASE=keycloak
+        - DB_PASSWORD=6jhVPaQWhgEMl0sXPnNmkLfS
+        - DB_PORT=5432
+        - DB_ADDR=keycloak_db
         - KEYCLOAK_USER=admin
         - KEYCLOAK_PASSWORD=pikathnoOoEezsSc0l8ZCfZs
+        - KEYCLOAK_STATISTICS=all
       links:
         - keycloak_db:postgres
       ports:
         - "18443:8443"
         - "18080:8080"
+        - "19990:9990"
       volumes:
         - keycloak_data:/data
-
+        - ./keycloak/providers:/opt/jboss/keycloak/providers
+        - ./keycloak/standalone/configuration:/opt/jboss/keycloak/standalone/configuration
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - 9090:9090
+    links:
+      - keycloak:keycloak
+  grafana:
+    image: grafana/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=eiK2othueiMeeF0b
+      - GF_USERS_ALLOW_SIGN_UP=false
+    depends_on:
+      - prometheus
+    ports:
+      - 13000:3000
+    volumes:      
+      - grafana_data:/var/lib/grafana
+      - ./grafana/plugins:/var/lib/grafana/plugins
+    links:
+      - prometheus:prometheus
 volumes: 
   keycloak_postgresql:
   keycloak_postgresql_data:
   keycloak_data:
+  prometheus_data:
+  grafana_data:
